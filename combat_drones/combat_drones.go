@@ -26,10 +26,10 @@ func (cd *CombatDrone) Run() {
 		// 请求情报数据
 		fmt.Printf("\033[32m[战斗无人机%d号]: 正在请求战斗任务\033[0m\n", cd.id) // 使用绿色显示战斗无人机的信息
 		data := <-cd.cc.RequestCombatData()
-		fmt.Printf("\033[32m[战斗无人机%d号]: 已接收到战斗任务： 根据%s开展秘密打击任务\033[0m\n", cd.id, data)
+		fmt.Printf("\033[32m[战斗无人机%d号]: 已接收到战斗任务： 根据%v的安排开展秘密打击任务\033[0m\n", cd.id, data) // 使用绿色显示战斗无人机的信息
 
 		// 模拟战斗任务
 		time.Sleep(5 * time.Second)
-		fmt.Printf("\033[32m[战斗无人机%d号]: 完成战斗任务\033[0m\n", cd.id)
+		fmt.Printf("\033[32m[战斗无人机%d号]: 完成战斗任务：%s\033[0m\n", cd.id, data)
 	}
 }
