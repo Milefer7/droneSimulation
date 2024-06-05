@@ -1,23 +1,33 @@
 package main
 
 import (
-	"fmt"
-	"github.com/Milefer7/droneSimulation/controllers"
-	"github.com/Milefer7/droneSimulation/utils"
+	"github.com/Milefer7/droneSimulation/combat_drones"
+	"github.com/Milefer7/droneSimulation/control_center"
+	"github.com/Milefer7/droneSimulation/scout_drones"
+	"time"
 )
 
 func main() {
-	fmt.Println("无人机战斗小组仿真系统")
-	for {
-		choice := utils.DisplayMenu()
-		switch choice {
-		case 1:
-			controllers.RunSimulation()
-		case 2:
-			fmt.Println("退出系统")
-			return
-		default:
-			fmt.Println("无效选项，请重试")
-		}
+	// 创建控制中心实例
+	cc := control_center.NewControlCenter()
+
+	// 启动控制中心
+	go cc.Run()
+
+	// 创建侦察无人机
+	numScoutDrones := 2
+	for i := 0; i < numScoutDrones; i++ {
+		sd := scout_drones.NewScoutDrone(i, cc)
+		go sd.Run()
 	}
+
+	// 创建战斗无人机
+	numCombatDrones := 5
+	for i := 0; i < numCombatDrones; i++ {
+		cd := combat_drones.NewCombatDrone(i, cc)
+		go cd.Run()
+	}
+
+	// 让程序运行一段时间以便观察输出
+	time.Sleep(90 * time.Second)
 }
