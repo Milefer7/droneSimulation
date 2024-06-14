@@ -2,8 +2,9 @@ package combat_drones
 
 import (
 	"fmt"
-	"github.com/Milefer7/droneSimulation/control_center"
 	"time"
+
+	"github.com/Milefer7/droneSimulation/control_center"
 )
 
 // CombatDrone 战斗无人机

@@ -2,9 +2,10 @@ package scout_drones
 
 import (
 	"fmt"
-	"github.com/Milefer7/droneSimulation/control_center"
 	"math/rand"
 	"time"
+
+	"github.com/Milefer7/droneSimulation/control_center"
 )
 
 // ScoutDrone 侦察无人机
