@@ -39,6 +39,13 @@ func NewControlCenter() *ControlCenter {
 
 //侦察无人机模块****************************************************************************************************************************
 
+// 侦察无人机函数
+func scoutDrone(id int, cc *ControlCenter, submitMu *sync.Mutex) {
+	for {
+		cc.SubmitIntelligence(id, submitMu)
+	}
+}
+
 // SubmitIntelligence 侦察无人机提交情报
 func (cc *ControlCenter) SubmitIntelligence(id int, submitMu *sync.Mutex) {
 	submitMu.Lock()
@@ -53,13 +60,6 @@ func (cc *ControlCenter) SubmitIntelligence(id int, submitMu *sync.Mutex) {
 	cc.condition.Broadcast() // 通知所有战斗无人机有新的情报
 	//time.Sleep(time.Duration(id*2+rand.Intn(3)) * time.Second)
 	time.Sleep(5 * time.Second)
-}
-
-// 侦察无人机函数
-func scoutDrone(id int, cc *ControlCenter, submitMu *sync.Mutex) {
-	for {
-		cc.SubmitIntelligence(id, submitMu)
-	}
 }
 
 //战斗无人机模块****************************************************************************************************************************
@@ -81,13 +81,12 @@ func combatDrone(id int, cc *ControlCenter) {
 
 // GetIntelligence 获取当前的情报
 func (cc *ControlCenter) GetIntelligence() *Intelligence {
-	cc.mu.RLock()
+	cc.mu.RLock() // 读锁, 多个战斗机都可以读
 	defer cc.mu.RUnlock()
 
 	for cc.intelligence == nil {
-		cc.condition.Wait() // 等待新的情报
+		cc.condition.Wait() // 等待新的情报，用信号的方式
 	}
-
 	return cc.intelligence
 }
 
@@ -104,7 +103,6 @@ func main() {
 	// 启动侦察无人机
 	for i := 1; i <= numReconDrones; i++ {
 		go scoutDrone(i, cc, submitMu)
-		//time.Sleep(100 * time.Millisecond) // 让侦察无人机稍微错开启动
 	}
 
 	// 主程序运行30秒后结束
