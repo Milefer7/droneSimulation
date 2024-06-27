@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"sync"
 	"time"
 )
 
+// 参数定义模块****************************************************************************************************************************
 const (
 	numReconDrones  = 3 // 侦察无人机数量
 	numCombatDrones = 5 // 战斗无人机数量
@@ -26,6 +26,8 @@ type ControlCenter struct {
 	taskCounter  int           // 任务计数器
 }
 
+//控制中心模块****************************************************************************************************************************
+
 // NewControlCenter 创建新的控制中心实例
 func NewControlCenter() *ControlCenter {
 	cc := &ControlCenter{
@@ -35,17 +37,7 @@ func NewControlCenter() *ControlCenter {
 	return cc
 }
 
-// GetIntelligence 获取当前的情报
-func (cc *ControlCenter) GetIntelligence() *Intelligence {
-	cc.mu.RLock()
-	defer cc.mu.RUnlock()
-
-	for cc.intelligence == nil {
-		cc.condition.Wait() // 等待新的情报
-	}
-
-	return cc.intelligence
-}
+//侦察无人机模块****************************************************************************************************************************
 
 // SubmitIntelligence 侦察无人机提交情报
 func (cc *ControlCenter) SubmitIntelligence(id int, submitMu *sync.Mutex) {
@@ -53,10 +45,8 @@ func (cc *ControlCenter) SubmitIntelligence(id int, submitMu *sync.Mutex) {
 	defer submitMu.Unlock()
 	cc.mu.Lock()
 	defer cc.mu.Unlock()
-
 	intel := &Intelligence{data: "侦察到的情报", taskNumber: cc.taskCounter}
 	cc.taskCounter++
-
 	// 输出侦察无人机提交情报的信息
 	fmt.Printf("\033[34m[侦察无人机%d号]: 提交在%v侦察到的情报 (任务编号: %d)\033[0m\n", id, time.Now().Format("15:04:05"), intel.taskNumber)
 	cc.intelligence = intel
@@ -71,6 +61,8 @@ func scoutDrone(id int, cc *ControlCenter, submitMu *sync.Mutex) {
 		cc.SubmitIntelligence(id, submitMu)
 	}
 }
+
+//战斗无人机模块****************************************************************************************************************************
 
 // 战斗无人机函数
 func combatDrone(id int, cc *ControlCenter) {
@@ -87,8 +79,20 @@ func combatDrone(id int, cc *ControlCenter) {
 	}
 }
 
+// GetIntelligence 获取当前的情报
+func (cc *ControlCenter) GetIntelligence() *Intelligence {
+	cc.mu.RLock()
+	defer cc.mu.RUnlock()
+
+	for cc.intelligence == nil {
+		cc.condition.Wait() // 等待新的情报
+	}
+
+	return cc.intelligence
+}
+
+// 主函数****************************************************************************************************************************
 func main() {
-	rand.Seed(time.Now().UnixNano())
 	cc := NewControlCenter()
 	submitMu := &sync.Mutex{}
 
