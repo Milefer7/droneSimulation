@@ -100,7 +100,7 @@ func main() {
 		go combatDrone(i, cc)
 	}
 
-	// 启动侦察无人机
+	// 启动侦察无人机2
 	for i := 1; i <= numReconDrones; i++ {
 		go scoutDrone(i, cc, submitMu)
 	}
